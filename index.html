@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Designora - Portfolio</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+      height: 100%; 
+      background: #000; 
+      overflow: hidden;
+      font-family: 'Arial', sans-serif;
+    }
+.slider {
+      width: 100%;
+      height: 100vh;
+      height: 100dvh; /* Mobile browser ke liye perfect height */
+      position: relative;
+      max-width: 430px; /* iPhone 14 Pro Max width */
+      margin: 0 auto; /* Desktop pe center me dikhega */
+      background: #000;
+    }
+.slide {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+.slide.active { opacity: 1; }
+    
+    /* YE SABSE IMPORTANT HAI - MOBILE REEL JAISE DIKHEGA */
+    video, img { 
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* cover = crop karke full screen, contain = black bars */
+    }
+.nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255,255,255,0.15);
+      color: white;
+      border: none;
+      font-size: 28px;
+      width: 44px;
+      height: 44px;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      border-radius: 50%;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+.nav-btn:active { transform: translateY(-50%) scale(0.9); }
+.prev { left: 10px; }
+.next { right: 10px; }
+.counter {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: white;
+      background: rgba(0,0,0,0.6);
+      padding: 6px 14px;
+      border-radius: 16px;
+      font-size: 13px;
+      z-index: 100;
+    }
+.dots {
+      position: absolute;
+      bottom: 55px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+      z-index: 100;
+    }
+.dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.4);
+      cursor: pointer;
+      transition: 0.3s;
+    }
+.dot.active { 
+      background: white; 
+      width: 20px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="slider">
+    <!-- ORDER: reel1 → reel2 → slide1-6 → reel3 -->
+    
+    <div class="slide active">
+      <video src="./media/reel1.mp4" muted playsinline loop></video>
+    </div>
+    
+    <div class="slide">
+      <video src="./media/reel2.mp4" muted playsinline loop></video>
+    </div>
+    
+    <div class="slide"><img src="./media/slide1.png" alt="Slide 1"></div>
+    <div class="slide"><img src="./media/slide2.png" alt="Slide 2"></div>
+    <div class="slide"><img src="./media/slide3.png" alt="Slide 3"></div>
+    <div class="slide"><img src="./media/slide4.png" alt="Slide 4"></div>
+    <div class="slide"><img src="./media/slide5.png" alt="Slide 5"></div>
+    <div class="slide"><img src="./media/slide6.png" alt="Slide 6"></div>
+    
+    <div class="slide">
+      <video src="./media/reel3.mp4" muted playsinline loop></video>
+    </div>
+
+    <button class="nav-btn prev" onclick="changeSlide(-1)">‹</button>
+    <button class="nav-btn next" onclick="changeSlide(1)">›</button>
+    
+    <div class="dots" id="dots"></div>
+    <div class="counter" id="counter">1 / 9</div>
+  </div>
+
+  <script>
+    let current = 0;
+    const slides = document.querySelectorAll('.slide');
+    const counter = document.getElementById('counter');
+    const dotsContainer = document.getElementById('dots');
+
+    slides.forEach((_, i) => {
+      const dot = document.createElement('div');
+      dot.className = 'dot';
+      if(i === 0) dot.classList.add('active');
+      dot.onclick = () => showSlide(i);
+      dotsContainer.appendChild(dot);
+    });
+    const dots = document.querySelectorAll('.dot');
+
+    function showSlide(n) {
+      const oldVideo = slides[current].querySelector('video');
+      if(oldVideo) oldVideo.pause();
+      
+      slides[current].classList.remove('active');
+      dots[current].classList.remove('active');
+      
+      current = (n + slides.length) % slides.length;
+      
+      slides[current].classList.add('active');
+      dots[current].classList.add('active');
+      counter.textContent = `${current + 1} / ${slides.length}`;
+      
+      const newVideo = slides[current].querySelector('video');
+      if(newVideo) {
+        newVideo.currentTime = 0;
+        newVideo.play();
+      }
+    }
+
+    function changeSlide(dir) { showSlide(current + dir); }
+
+    const firstVideo = slides[0].querySelector('video');
+    if(firstVideo) firstVideo.play();
+
+    let startX = 0;
+    document.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+    document.addEventListener('touchend', e => {
+      let endX = e.changedTouches[0].clientX;
+      if (startX - endX > 50) changeSlide(1);
+      if (endX - startX > 50) changeSlide(-1);
+    });
+
+    document.addEventListener('keydown', e => {
+      if(e.key === 'ArrowRight') changeSlide(1);
+      if(e.key === 'ArrowLeft') changeSlide(-1);
+    });
+  </script>
+</body>
+</html>
