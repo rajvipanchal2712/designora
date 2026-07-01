@@ -2,26 +2,27 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Designora - Portfolio</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { 
+      margin: 0; 
+      padding: 0; 
+      width: 100%;
       height: 100%; 
       background: #000; 
       overflow: hidden;
-      font-family: 'Arial', sans-serif;
+      font-family: Arial, sans-serif;
     }
-.slider {
+   .slider {
       width: 100%;
-      height: 100vh;
-      height: 100dvh; /* Mobile browser ke liye perfect height */
+      height: 100%;
       position: relative;
-      max-width: 430px; /* iPhone 14 Pro Max width */
-      margin: 0 auto; /* Desktop pe center me dikhega */
-      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
-.slide {
+   .slide {
       position: absolute;
       width: 100%;
       height: 100%;
@@ -29,16 +30,21 @@
       left: 0;
       opacity: 0;
       transition: opacity 0.4s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
-.slide.active { opacity: 1; }
+   .slide.active { opacity: 1; }
     
-    /* YE SABSE IMPORTANT HAI - MOBILE REEL JAISE DIKHEGA */
+    /* MAIN FIX - MOBILE + DESKTOP NO CUT */
     video, img { 
-      width: 100%;
-      height: 100%;
-      object-fit: cover; /* cover = crop karke full screen, contain = black bars */
+      max-width: 100%; 
+      max-height: 100%;
+      width: auto;
+      height: auto;
     }
-.nav-btn {
+    
+   .nav-btn {
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
@@ -52,14 +58,10 @@
       backdrop-filter: blur(10px);
       border-radius: 50%;
       z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
-.nav-btn:active { transform: translateY(-50%) scale(0.9); }
-.prev { left: 10px; }
-.next { right: 10px; }
-.counter {
+   .prev { left: 10px; }
+   .next { right: 10px; }
+   .counter {
       position: absolute;
       bottom: 20px;
       left: 50%;
@@ -71,7 +73,7 @@
       font-size: 13px;
       z-index: 100;
     }
-.dots {
+   .dots {
       position: absolute;
       bottom: 55px;
       left: 50%;
@@ -80,15 +82,14 @@
       gap: 6px;
       z-index: 100;
     }
-.dot {
+   .dot {
       width: 6px;
       height: 6px;
       border-radius: 50%;
       background: rgba(255,255,255,0.4);
       cursor: pointer;
-      transition: 0.3s;
     }
-.dot.active { 
+   .dot.active { 
       background: white; 
       width: 20px;
       border-radius: 3px;
@@ -100,7 +101,7 @@
     <!-- ORDER: reel1 → reel2 → slide1-6 → reel3 -->
     
     <div class="slide active">
-      <video src="./media/reel1.mp4" muted playsinline loop></video>
+      <video src="./media/reel1.mp4" muted playsinline loop autoplay></video>
     </div>
     
     <div class="slide">
@@ -162,9 +163,17 @@
 
     function changeSlide(dir) { showSlide(current + dir); }
 
+    // First video autoplay
     const firstVideo = slides[0].querySelector('video');
     if(firstVideo) firstVideo.play();
 
+    // Mobile autoplay fix
+    document.addEventListener('click', () => {
+      const activeVideo = slides[current].querySelector('video');
+      if(activeVideo) activeVideo.play();
+    });
+
+    // Swipe
     let startX = 0;
     document.addEventListener('touchstart', e => startX = e.touches[0].clientX);
     document.addEventListener('touchend', e => {
@@ -173,6 +182,7 @@
       if (endX - startX > 50) changeSlide(-1);
     });
 
+    // Keyboard
     document.addEventListener('keydown', e => {
       if(e.key === 'ArrowRight') changeSlide(1);
       if(e.key === 'ArrowLeft') changeSlide(-1);
